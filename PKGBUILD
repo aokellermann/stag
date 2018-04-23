@@ -1,12 +1,13 @@
 # Maintainer: Antony Kellermann <aokellermann@gmail.com>
 
 pkgname=stag
-pkgver=1.0.0
+pkgver=1.1.0
 pkgrel=1
 pkgdesc="Command line image steganographic injector and extractor."
 arch=('x86_64')
 url="https://github.com/aokellermann/${pkgname}"
 license=('MIT')
+depends=('libpng')
 provides=("${pkgname}")
 conflicts=("${pkgname}")
 source=("git://github.com/aokellermann/${pkgname}")

@@ -1,13 +1,22 @@
 ## Command line image steganographic injector and extractor
 #### How to install:
+Before installation, make sure all dependencies are installed:
+* libpng
 ```bash
-$ git clone https://github.com/aokellermann/tick.git
+$ git clone https://github.com/aokellermann/stag.git
 $ cd stag
 $ make
 $ sudo make install
 ```
+If you are an Arch user, you can install using the provided PKGBUILD.
+```bash
+$ git clone https://github.com/aokellermann/stag.git
+$ cd stag
+$ makepkg
+$ sudo pacman -U *.xz
+```
 #### Usage
-This program currently only works for PPM images. In the future, more
+This program currently only works for PNG and PPM images. In the future, more
 formats will be supported.
 
 To inject an image with another image, run
