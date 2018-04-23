@@ -54,7 +54,8 @@ PNG* png_read_file(char* file_path) {
     png_image->height = png_get_image_height(png, info);
     png_image->bit_depth = png_get_bit_depth(png, info);
     png_image->color_type = png_get_color_type(png, info);
-
+    png_image->row_bytes = png_get_rowbytes(png, info);
+    png_image->components = png_get_channels(png, info);
     if (png_image->bit_depth == 16)
         png_set_strip_16(png);
 
@@ -74,7 +75,7 @@ PNG* png_read_file(char* file_path) {
 
     png_bytepp row_pointers = malloc(sizeof(png_bytep) * png_image->height);
     for (unsigned int i = 0; i < png_image->height; i++)
-        row_pointers[i] = malloc(png_get_rowbytes(png, info));
+        row_pointers[i] = malloc(png_image->row_bytes);
 
     png_image->row_pointers = row_pointers;
     png_read_image(png, row_pointers);
@@ -107,6 +108,59 @@ void png_write_file(PNG* png, char* file_path) {
     png_write_end(png_write, NULL);
     png_destroy_write_struct(&png_write, &info);
     fclose(fp);
+}
+
+void png_inject_png(PNG* super_png, PNG* sub_png){
+    png_bytep super_row, sub_row;
+    png_byte data_point;
+    int index;
+    for (unsigned int i = 0; i < super_png->height; i++) {
+        super_row = super_png->row_pointers[i];
+        sub_row = sub_png->row_pointers[i];
+        for (unsigned int j = 0; j < super_png->width; j++) {
+            for (int k = 0; k < super_png->components; k++) {
+                index = k + j * super_png->components;
+                data_point = super_row[index];
+                data_point >>= 2;
+                data_point <<= 2; // Clears right two bits
+                // Sets right two bits to value from 0 to 3
+                super_row[index] = (unsigned char) (data_point + sub_row[index] / 64);
+            }
+        }
+    }
+}
+
+PNG* png_extract_png(PNG* super_png){
+    PNG* sub_png = malloc(sizeof(PNG));
+    sub_png->row_pointers = malloc(sizeof(png_bytep) * super_png->height);
+    for (unsigned int i = 0; i < super_png->height; i++) {
+        sub_png->row_pointers[i] = malloc(super_png->row_bytes);
+        memcpy(sub_png->row_pointers[i], super_png->row_pointers[i], super_png->row_bytes);
+    }
+    sub_png->width = super_png->width;
+    sub_png->height = super_png->height;
+    sub_png->bit_depth = super_png->bit_depth;
+    sub_png->color_type = super_png->color_type;
+    sub_png->row_bytes = super_png->row_bytes;
+    sub_png->components = super_png->components;
+
+    png_bytep super_row, sub_row;
+    png_byte data_point;
+    int index;
+    for (unsigned int i = 0; i < super_png->height; i++) {
+        for (unsigned int j = 0; j < super_png->width; j++) {
+            for (int k = 0; k < super_png->components; k++) {
+                super_row = super_png->row_pointers[i];
+                sub_row = sub_png->row_pointers[i];
+                index = k + j * super_png->components;
+                data_point = super_row[index];
+                data_point <<= 6;
+                data_point >>= 6; // Clears left 6 bits
+                sub_row[index] = (unsigned char) (data_point * 85);
+            }
+        }
+    }
+    return sub_png;
 }
 
 void png_destroy(PNG** phPNG) {

@@ -14,6 +14,8 @@ struct png {
     png_uint_32 height;
     png_byte bit_depth;
     png_byte color_type;
+    png_size_t row_bytes;
+    png_byte components;
 };
 
 typedef struct png PNG;
@@ -31,6 +33,10 @@ PNG* png_read_file(char* file_path);
  * @param file_path .png file path to write to
  */
 void png_write_file(PNG* png, char* file_path);
+
+void png_inject_png(PNG* super_png, PNG* sub_png);
+
+PNG* png_extract_png(PNG* super_png);
 
 /**
  * Frees any heap allocated data contained in a PNG struct and sets the handle to NULL

@@ -37,15 +37,15 @@ int main(int argc, char* argv[]) {
         PNG* super_png = png_read_file(argv[2]);
         PNG* sub_png = NULL;
         if (inject) {
-            //sub_png = png_read_file(argv[3]);
-            //ppm_inject_png(super_png, sub_png);
+            sub_png = png_read_file(argv[3]);
+            png_inject_png(super_png, sub_png);
             png_write_file(super_png, argv[4]);
         } else {
-            //sub_png = ppm_extract_png(super_png);
-            //png_write_file(sub_png, argv[3]);
+            sub_png = png_extract_png(super_png);
+            png_write_file(sub_png, argv[3]);
         }
         png_destroy(&super_png);
-        //png_destroy(&sub_png);
+        png_destroy(&sub_png);
     }
 
     return 0;
