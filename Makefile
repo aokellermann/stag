@@ -6,8 +6,8 @@ CFLAGS = -g -Wall --std=c99 -D_FORTIFY_SOURCE=2 -O2 \
 -Wbad-function-cast -Wstrict-overflow=5 -Wstrict-prototypes -Winline \
 -Wundef -Wnested-externs -Wcast-qual -Wunreachable-code \
 -ggdb3 -fno-omit-frame-pointer -ffloat-store -fno-common -fstrict-aliasing
-LIBS =
-OBJECTS = main.o ppm.o
+LIBS = -lz -lpng
+OBJECTS = main.o ppm.o png.o
 BIN = stag
 DESTDIR = /usr
 
